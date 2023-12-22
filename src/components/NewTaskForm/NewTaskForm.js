@@ -7,8 +7,8 @@ function NewTaskForm({ onAddTask }) {
     setNewTask(e.target.value)
   }
 
-  const handleAddTask = () => {
-    if (newTask.trim() !== '') {
+  const handleAddTask = (e) => {
+    if ((e.key === 'Enter' || e.type === 'click') && newTask.trim() !== '') {
       onAddTask(newTask)
       setNewTask('')
     }
@@ -22,9 +22,10 @@ function NewTaskForm({ onAddTask }) {
         placeholder="What needs to be done?"
         value={newTask}
         onChange={handleInputChange}
-        onKeyPress={(e) => e.key === 'Enter' && handleAddTask()}
+        onKeyPress={handleAddTask}
         autoFocus
       />
+      <button className="icon icon-add" onClick={handleAddTask} />
     </header>
   )
 }
