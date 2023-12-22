@@ -18,6 +18,12 @@ function App() {
     setTasks((prevTasks) => [...prevTasks, newTask])
   }
 
+  const editTask = (taskId, newDescription) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) => (task.id === taskId ? { ...task, description: newDescription } : task))
+    )
+  }
+
   const toggleTask = (taskId) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === taskId ? { ...task, completed: !task.completed } : task))
@@ -45,13 +51,8 @@ function App() {
     <section className="todoapp">
       <NewTaskForm onAddTask={addTask} />
       <section className="main">
-        <TasksList tasks={filteredTasks} onToggle={toggleTask} onDelete={deleteTask} />
-        <Footer
-          itemsLeft={itemsLeft}
-          onClearCompleted={clearCompleted}
-          activeFilter={filter}
-          onFilterChange={setFilter}
-        />
+        <TasksList tasks={filteredTasks} onToggle={toggleTask} onDelete={deleteTask} onEdit={editTask} />
+        <Footer itemsLeft={itemsLeft} onClearCompleted={clearCompleted} onFilterChange={setFilter} />
       </section>
     </section>
   )
