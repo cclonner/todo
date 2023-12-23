@@ -5,11 +5,8 @@
   },
   "ignorePatterns": ["node_modules", "dist", "build"],
   "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "plugin:prettier/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings"
+    "airbnb",
+    "plugin:prettier/recommended"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -18,16 +15,9 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier", "import", "eslint-plugin-prettier"],
+  "plugins": ["prettier"],
   "rules": {
-    "indent": ["error", 2],
     "prettier/prettier": "error",
-    "linebreak-style": [0, "unix"],
-    "quotes": ["error", "single"],
-    "semi": ["error", "never"],
-    "react/react-in-jsx-scope": "off",
-    "react/prop-types": 0,
-    "import/no-unresolved": [2, { "caseSensitive": false }],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "import/order": [
       2,
