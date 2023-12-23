@@ -2,7 +2,7 @@ import React from 'react'
 
 import Task from '../Task'
 
-const TasksList = ({ tasks, onToggle, onDelete, onEdit }) => {
+function TasksList({ tasks, onToggle, onDelete, onEdit }) {
   return (
     <ul className="todo-list">
       {tasks.map((task) => (

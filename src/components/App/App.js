@@ -51,7 +51,12 @@ function App() {
     <section className="todoapp">
       <NewTaskForm onAddTask={addTask} />
       <section className="main">
-        <TasksList tasks={filteredTasks} onToggle={toggleTask} onDelete={deleteTask} onEdit={editTask} />
+        <TasksList
+          tasks={filteredTasks}
+          onToggle={(taskId) => toggleTask(taskId)}
+          onDelete={(taskId) => deleteTask(taskId)}
+          onEdit={(taskId, newDescription) => editTask(taskId, newDescription)}
+        />
         <Footer itemsLeft={itemsLeft} onClearCompleted={clearCompleted} onFilterChange={setFilter} />
       </section>
     </section>
