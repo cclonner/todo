@@ -19,10 +19,10 @@ function NewTaskForm({ onAddTask }) {
       <h1>todos</h1>
       <input
         className="new-todo"
-        placeholder="What needs to be done?"
+        placeholder=""
         value={newTask}
         onChange={handleInputChange}
-        onKeyPress={handleAddTask}
+        onKeyDown={handleAddTask}
         autoFocus
       />
       <button className="icon icon-add" onClick={handleAddTask} />
