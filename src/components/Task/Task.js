@@ -1,25 +1,49 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-restricted-globals */
 import React, { useState, useEffect, useRef } from 'react'
-import { formatDistanceToNow, format } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
 function Task({ task, onToggle, onDelete, onEdit }) {
-  const { id, description, created, completed } = task
+  const { id, description, created, completed, min: taskMin, sec: taskSec } = task
+  const [min, sec] = [taskMin || 0, taskSec || 0]
   const [isEditing, setEditing] = useState(false)
   const [editedDescription, setEditedDescription] = useState(description)
-  const [elapsedTime, setElapsedTime] = useState(0)
+  const [elapsedTime, setElapsedTime] = useState(min * 60 * 1000 + sec * 1000 || 10 * 60 * 1000)
+  const [isRunning, setIsRunning] = useState(false)
+  const [isPaused, setIsPaused] = useState(false)
   const timer = useRef(null)
 
   const startTimer = () => {
-    const startTime = Date.now() - elapsedTime
-    timer.current = requestAnimationFrame(function tick() {
-      setElapsedTime(Date.now() - startTime)
-      timer.current = requestAnimationFrame(tick)
-    })
+    timer.current = setInterval(() => {
+      setElapsedTime((prevTime) => {
+        if (prevTime > 0) {
+          return prevTime - 1000
+        }
+        onToggle(id)
+        clearInterval(timer.current)
+        timer.current = null
+        setIsRunning(false)
+        return 0
+      })
+    }, 1000)
+
+    setIsRunning(true)
   }
 
-  const stopTimer = () => {
-    cancelAnimationFrame(timer.current)
+  const pauseTimer = () => {
+    clearInterval(timer.current)
     timer.current = null
+    setIsRunning(false)
+    setIsPaused(true)
+  }
+
+  const resumeTimer = () => {
+    if (isRunning) {
+      pauseTimer()
+    } else {
+      startTimer()
+    }
   }
 
   const handleToggle = () => {
@@ -27,7 +51,7 @@ function Task({ task, onToggle, onDelete, onEdit }) {
   }
 
   const handleDelete = () => {
-    stopTimer()
+    clearInterval(timer.current)
     onDelete(id)
   }
 
@@ -51,7 +75,8 @@ function Task({ task, onToggle, onDelete, onEdit }) {
 
   useEffect(() => {
     if (completed) {
-      stopTimer()
+      clearInterval(timer.current)
+      timer.current = null
     }
   }, [completed])
 
@@ -65,12 +90,14 @@ function Task({ task, onToggle, onDelete, onEdit }) {
               <span className="title">{description}</span>
               <span className="description">
                 {!completed && (
-                  <button
-                    className={`icon icon-${timer.current !== null ? 'pause' : 'play'}`}
-                    onClick={timer.current !== null ? stopTimer : startTimer}
-                  >
-                    {format(new Date(elapsedTime), 'mm:ss')}
-                  </button>
+                  <>
+                    <button
+                      className={`icon icon-${isRunning ? 'pause' : 'play'}`}
+                      onClick={resumeTimer}
+                      style={{ marginRight: '8px' }}
+                    />
+                    {`${Math.floor(elapsedTime / 60000)}:${Math.floor((elapsedTime % 60000) / 1000)}`}
+                  </>
                 )}
               </span>
               <span className="created">{`created ${formatDistanceToNow(new Date(created.getTime()))}`}</span>
@@ -102,6 +129,8 @@ Task.propTypes = {
     description: PropTypes.string.isRequired,
     created: PropTypes.instanceOf(Date).isRequired,
     completed: PropTypes.bool.isRequired,
+    min: PropTypes.number.isRequired,
+    sec: PropTypes.number.isRequired,
   }).isRequired,
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,

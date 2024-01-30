@@ -8,14 +8,16 @@ function App() {
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('all')
 
-  const addTask = (description) => {
+  const addTask = (description, min, sec) => {
     const newTask = {
       id: Date.now(),
       description,
+      min,
+      sec,
       created: new Date(),
       completed: false,
     }
-    setTasks((prevTasks) => [...prevTasks, newTask])
+    setTasks((prevTasks) => [newTask, ...prevTasks])
   }
 
   const editTask = (taskId, newDescription) => {
