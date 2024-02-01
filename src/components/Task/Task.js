@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-restricted-globals */
 import React, { useState, useEffect, useRef } from 'react'
@@ -69,6 +70,12 @@ function Task({ task, onToggle, onDelete, onEdit }) {
     setEditing(false)
   }
 
+  const handleEscapeKey = (e) => {
+    if (e.key === 'Escape') {
+      handleCancel()
+    }
+  }
+
   const handleDescriptionChange = (e) => {
     setEditedDescription(e.target.value)
   }
@@ -78,13 +85,34 @@ function Task({ task, onToggle, onDelete, onEdit }) {
       clearInterval(timer.current)
       timer.current = null
     }
+    window.addEventListener('keydown', handleEscapeKey)
+    return () => {
+      window.removeEventListener('keydown', handleEscapeKey)
+    }
   }, [completed])
 
   return (
     <li className={completed ? 'completed' : ''}>
       <div className="view">
         <input className="toggle" type="checkbox" checked={completed} onChange={handleToggle} />
-        {!isEditing ? (
+        {isEditing ? (
+          <>
+            <input
+              className="edit"
+              type="text"
+              value={editedDescription}
+              onChange={handleDescriptionChange}
+              autoFocus
+              onBlur={handleCancel}
+              onKeyDown={(e) => {
+                e.key === 'Enter' && handleSave()
+                e.key === 'Escape' && handleCancel()
+              }}
+              // style={{ width: '80%', height: '20px' }}
+            />
+            <button className="icon icon-edit" onClick={handleCancel} />
+          </>
+        ) : (
           <>
             <label>
               <span className="title">{description}</span>
@@ -104,19 +132,8 @@ function Task({ task, onToggle, onDelete, onEdit }) {
             </label>
             <button className="icon icon-edit" onClick={handleEdit} />
           </>
-        ) : (
-          <>
-            <input
-              type="text"
-              value={editedDescription}
-              onChange={handleDescriptionChange}
-              autoFocus
-              onBlur={handleSave}
-              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-            />
-            <button className="icon icon-edit" onClick={handleCancel} />
-          </>
         )}
+        {/* Wrap the delete button inside parentheses */}
         <button className="icon icon-destroy" onClick={handleDelete} />
       </div>
     </li>
