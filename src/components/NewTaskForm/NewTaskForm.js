@@ -10,11 +10,13 @@ function NewTaskForm({ onAddTask }) {
   }
 
   const handleMinChange = (e) => {
-    setMin(e.target.value)
+    const numericValue = e.target.value.replace(/\D/, '')
+    setMin(numericValue)
   }
 
   const handleSecChange = (e) => {
-    setSec(e.target.value)
+    const numericValue = e.target.value.replace(/\D/, '')
+    setSec(numericValue)
   }
 
   const handleAddTask = (e) => {
