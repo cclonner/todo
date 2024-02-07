@@ -11,7 +11,7 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
   const [isEditing, setEditing] = useState(false)
   const [editedDescription, setEditedDescription] = useState(description)
   const [elapsedTime, setElapsedTime] = useState(min * 60 * 1000 + sec * 1000 || 10 * 60 * 1000)
-  const [isRunning, setIsRunning] = useState(!task.isRunning)
+  const [isRunning, setIsRunning] = useState(task.isRunning)
   const [isPaused, setIsPaused] = useState(true)
   const timer = useRef(null)
 
@@ -96,9 +96,10 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
     console.log('lastSavedTime, task.isRunning', lastSavedTime, task.isRunning)
     if (lastSavedTime && task.isRunning) {
       const now = new Date()
-      const diff = Math.floor((now - new Date(lastSavedTime)) / 1000) // в секундах
-      const newElapsedTime = elapsedTime - diff * 1000 // в миллисекундах
+      const diff = Math.floor((now - new Date(lastSavedTime)) / 1000)
+      const newElapsedTime = elapsedTime - diff * 1000
       setElapsedTime(newElapsedTime > 0 ? newElapsedTime : 0)
+      startTimer()
       console.log('newElapsedTime', newElapsedTime)
     }
   }, [])
