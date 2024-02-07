@@ -147,7 +147,9 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
                       onClick={resumeTimer}
                       style={{ marginRight: '8px' }}
                     />
-                    {`${Math.floor(elapsedTime / 60000)}:${Math.floor((elapsedTime % 60000) / 1000)}`}
+                    <span style={{ color: elapsedTime === 0 ? 'red' : 'inherit' }}>
+                      {`${Math.floor(elapsedTime / 60000)}:${Math.floor((elapsedTime % 60000) / 1000)}`}
+                    </span>
                   </>
                 )}
               </span>

@@ -7,7 +7,6 @@ import Footer from '../Footer'
 function App() {
   const [tasks, setTasks] = useState([])
   const [filter, setFilter] = useState('all')
-  console.log(tasks)
   const addTask = (description, min, sec) => {
     const newTask = {
       id: Date.now(),
