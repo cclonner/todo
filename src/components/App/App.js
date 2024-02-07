@@ -6,7 +6,6 @@ import Footer from '../Footer'
 
 function App() {
   const [tasks, setTasks] = useState([])
-  console.log(tasks)
   const [filter, setFilter] = useState('all')
 
   const addTask = (description, min, sec) => {
@@ -43,14 +42,6 @@ function App() {
     setTasks((prevTasks) => prevTasks.filter((task) => !task.completed))
   }
   const updateTime = (taskId, minutes, seconds, isRunning, lastSavedTime) => {
-    console.log(
-      'taskId, minutes, seconds prevStart, получено в апп отправленно в task',
-      taskId,
-      minutes,
-      seconds,
-      isRunning,
-      lastSavedTime
-    )
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
         task.id === taskId ? { ...task, min: minutes, sec: seconds, isRunning, lastSavedTime } : task

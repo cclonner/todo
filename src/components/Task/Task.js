@@ -81,7 +81,6 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
 
   useEffect(() => {
     return () => {
-      console.log('isRunning, unmauting', isRunning)
       if (isRunning) {
         const unmountTime = new Date()
         const remainingMin = Math.floor(elapsedTime / 60000)
@@ -91,16 +90,13 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
     }
   }, [elapsedTime])
 
-  // При маунтинге
   useEffect(() => {
-    console.log('lastSavedTime, task.isRunning', lastSavedTime, task.isRunning)
     if (lastSavedTime && task.isRunning) {
       const now = new Date()
       const diff = Math.floor((now - new Date(lastSavedTime)) / 1000)
       const newElapsedTime = elapsedTime - diff * 1000
       setElapsedTime(newElapsedTime > 0 ? newElapsedTime : 0)
       startTimer()
-      console.log('newElapsedTime', newElapsedTime)
     }
   }, [])
 
