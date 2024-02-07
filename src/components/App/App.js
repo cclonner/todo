@@ -6,6 +6,7 @@ import Footer from '../Footer'
 
 function App() {
   const [tasks, setTasks] = useState([])
+  console.log(tasks)
   const [filter, setFilter] = useState('all')
 
   const addTask = (description, min, sec) => {
@@ -14,6 +15,8 @@ function App() {
       description,
       min,
       sec,
+      isRunning: null,
+      lastSavedTime: null,
       created: new Date(),
       completed: false,
     }
@@ -39,6 +42,21 @@ function App() {
   const clearCompleted = () => {
     setTasks((prevTasks) => prevTasks.filter((task) => !task.completed))
   }
+  const updateTime = (taskId, minutes, seconds, isRunning, lastSavedTime) => {
+    console.log(
+      'taskId, minutes, seconds prevStart, получено в апп отправленно в task',
+      taskId,
+      minutes,
+      seconds,
+      isRunning,
+      lastSavedTime
+    )
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task.id === taskId ? { ...task, min: minutes, sec: seconds, isRunning, lastSavedTime } : task
+      )
+    )
+  }
 
   const itemsLeft = tasks.filter((task) => !task.completed).length
 
@@ -57,7 +75,8 @@ function App() {
           tasks={filteredTasks}
           onToggle={(taskId) => toggleTask(taskId)}
           onDelete={(taskId) => deleteTask(taskId)}
-          onEdit={(taskId, newDescription) => editTask(taskId, newDescription)}
+          onEdit={editTask}
+          onUpdate={updateTime}
         />
         <Footer itemsLeft={itemsLeft} onClearCompleted={clearCompleted} onFilterChange={setFilter} />
       </section>

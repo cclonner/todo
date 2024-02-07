@@ -5,14 +5,14 @@ import React, { useState, useEffect, useRef } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
-function Task({ task, onToggle, onDelete, onEdit }) {
-  const { id, description, created, completed, min: taskMin, sec: taskSec } = task
+function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
+  const { id, description, created, completed, min: taskMin, sec: taskSec, lastSavedTime } = task
   const [min, sec] = [taskMin || 0, taskSec || 0]
   const [isEditing, setEditing] = useState(false)
   const [editedDescription, setEditedDescription] = useState(description)
   const [elapsedTime, setElapsedTime] = useState(min * 60 * 1000 + sec * 1000 || 10 * 60 * 1000)
-  const [isRunning, setIsRunning] = useState(false)
-  const [isPaused, setIsPaused] = useState(false)
+  const [isRunning, setIsRunning] = useState(!task.isRunning)
+  const [isPaused, setIsPaused] = useState(true)
   const timer = useRef(null)
 
   const startTimer = () => {
@@ -28,7 +28,6 @@ function Task({ task, onToggle, onDelete, onEdit }) {
         return 0
       })
     }, 1000)
-
     setIsRunning(true)
   }
 
@@ -81,15 +80,43 @@ function Task({ task, onToggle, onDelete, onEdit }) {
   }
 
   useEffect(() => {
-    if (completed) {
-      clearInterval(timer.current)
-      timer.current = null
+    return () => {
+      console.log('isRunning, unmauting', isRunning)
+      if (isRunning) {
+        const unmountTime = new Date()
+        const remainingMin = Math.floor(elapsedTime / 60000)
+        const remainingSec = ((elapsedTime % 60000) / 1000).toFixed(0)
+        onUpdate(id, remainingMin, remainingSec, isRunning, unmountTime)
+      }
     }
+  }, [elapsedTime])
+
+  // При маунтинге
+  useEffect(() => {
+    console.log('lastSavedTime, task.isRunning', lastSavedTime, task.isRunning)
+    if (lastSavedTime && task.isRunning) {
+      const now = new Date()
+      const diff = Math.floor((now - new Date(lastSavedTime)) / 1000) // в секундах
+      const newElapsedTime = elapsedTime - diff * 1000 // в миллисекундах
+      setElapsedTime(newElapsedTime > 0 ? newElapsedTime : 0)
+      console.log('newElapsedTime', newElapsedTime)
+    }
+  }, [])
+
+  useEffect(() => {
     window.addEventListener('keydown', handleEscapeKey)
     return () => {
       window.removeEventListener('keydown', handleEscapeKey)
     }
   }, [completed])
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) {
+        clearInterval(timer.current)
+      }
+    }
+  }, [])
 
   return (
     <li className={completed ? 'completed' : ''}>
@@ -108,7 +135,6 @@ function Task({ task, onToggle, onDelete, onEdit }) {
                 e.key === 'Enter' && handleSave()
                 e.key === 'Escape' && handleCancel()
               }}
-              // style={{ width: '80%', height: '20px' }}
             />
             <button className="icon icon-edit" onClick={handleCancel} />
           </>
@@ -133,7 +159,6 @@ function Task({ task, onToggle, onDelete, onEdit }) {
             <button className="icon icon-edit" onClick={handleEdit} />
           </>
         )}
-        {/* Wrap the delete button inside parentheses */}
         <button className="icon icon-destroy" onClick={handleDelete} />
       </div>
     </li>
@@ -152,6 +177,7 @@ Task.propTypes = {
   onToggle: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
+  onUpdate: PropTypes.func.isRequired,
 }
 
 export default Task
