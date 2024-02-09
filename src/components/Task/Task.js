@@ -6,13 +6,12 @@ import { formatDistanceToNow } from 'date-fns'
 import PropTypes from 'prop-types'
 
 function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
-  const { id, description, created, completed, min: taskMin, sec: taskSec, lastSavedTime } = task
+  const { id, description, created, completed, min: taskMin, sec: taskSec, isRunning, lastSavedTime } = task
   const [min, sec] = [taskMin || 0, taskSec || 0]
   const [isEditing, setEditing] = useState(false)
   const [editedDescription, setEditedDescription] = useState(description)
   const [elapsedTime, setElapsedTime] = useState(min * 60 * 1000 + sec * 1000 || 10 * 60 * 1000)
-  const [isRunning, setIsRunning] = useState(task.isRunning)
-  const [isPaused, setIsPaused] = useState(true)
+  const [started, setIsRunning] = useState(isRunning || false)
   const timer = useRef(null)
 
   const startTimer = () => {
@@ -35,15 +34,15 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
     clearInterval(timer.current)
     timer.current = null
     setIsRunning(false)
-    setIsPaused(true)
   }
 
   const resumeTimer = () => {
-    if (isRunning) {
+    if (started) {
       pauseTimer()
     } else {
       startTimer()
     }
+    setIsRunning(!started)
   }
 
   const handleToggle = () => {
@@ -81,17 +80,18 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
 
   useEffect(() => {
     return () => {
-      if (isRunning) {
-        const unmountTime = new Date()
-        const remainingMin = Math.floor(elapsedTime / 60000)
-        const remainingSec = Math.floor((elapsedTime % 60000) / 1000)
-        onUpdate(id, remainingMin, remainingSec, isRunning, unmountTime)
+      const unmountTime = new Date()
+      const remainingMin = Math.floor(elapsedTime / 60000)
+      const remainingSec = Math.floor((elapsedTime % 60000) / 1000)
+      if (started) {
+        onUpdate(id, remainingMin, remainingSec, started, unmountTime)
       }
+      onUpdate(id, Math.floor(elapsedTime / 60000), Math.floor((elapsedTime % 60000) / 1000), started, unmountTime)
     }
-  }, [elapsedTime])
+  }, [elapsedTime, started])
 
   useEffect(() => {
-    if (lastSavedTime && task.isRunning) {
+    if (lastSavedTime && started) {
       const now = new Date()
       const diff = Math.floor((now - new Date(lastSavedTime)) / 1000)
       const newElapsedTime = elapsedTime - diff * 1000
@@ -143,7 +143,7 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
                 {!completed && (
                   <>
                     <button
-                      className={`icon icon-${isRunning ? 'pause' : 'play'}`}
+                      className={`icon icon-${started ? 'pause' : 'play'}`}
                       onClick={resumeTimer}
                       style={{ marginRight: '8px' }}
                     />

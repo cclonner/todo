@@ -13,7 +13,7 @@ function App() {
       description,
       min,
       sec,
-      isRunning: null,
+      isRunning: false,
       lastSavedTime: null,
       created: new Date(),
       completed: false,
