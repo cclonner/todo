@@ -83,10 +83,7 @@ function Task({ task, onToggle, onDelete, onEdit, onUpdate }) {
       const unmountTime = new Date()
       const remainingMin = Math.floor(elapsedTime / 60000)
       const remainingSec = Math.floor((elapsedTime % 60000) / 1000)
-      if (started) {
-        onUpdate(id, remainingMin, remainingSec, started, unmountTime)
-      }
-      onUpdate(id, Math.floor(elapsedTime / 60000), Math.floor((elapsedTime % 60000) / 1000), started, unmountTime)
+      onUpdate(id, remainingMin, remainingSec, started, unmountTime)
     }
   }, [elapsedTime, started])
 
